@@ -1,5 +1,31 @@
 # Day 11 — Controlled Agent Security (2026)
 
+**Trần Hải Long · 2A202603891 · K5-L3B**
+
+## Blue checkpoint results
+
+The local run uses deterministic fixtures. The live OpenRouter model and the separate Red checkpoint have no results in this checkout. The course grader marks the overall package incomplete because \`outputs/attack_results.json\` is missing.
+
+- All six banking controls passed. All seven defensive probes and three edge cases were blocked.
+- The rate limiter let through 10 of 15 requests in a 60-second window. The audit records all 31 decisions and the monitor reports a rate-limit alert.
+- All ten upstream PII examples matched their labels. The pipeline also redacted a mixed test reply before it reached the user preview and audit.
+- The egress check allowed the approved endpoint and denied a foreign destination and a sensitive payload. The test makes no outbound transfer.
+
+The same Blue callbacks run in both fixture and live mode. The suite uses separate user IDs for the control groups and deliberately reuses one user ID to measure rate limiting. Audit and monitoring observe the completed request. The patterns cover known instruction overrides and the supplied PII formats. Their results do not establish general detection or the accuracy of an upstream model.
+
+### Reproduce locally
+
+Run from the repo root with Python 3.12 and dependencies from \`requirements.txt\`.
+
+\`\`\`bash
+python src/main.py --part 2
+python src/main.py --part 3 --offline
+python -m pytest tests/smoke tests/public -q
+python scripts/grade.py --submission-dir . --out outputs/grade_report.json
+\`\`\`
+
+With an OpenRouter key configured locally, \`python src/main.py --part 3\` selects the course's configured live Blue model. Check \`model_execution\` in the generated result. [Blue results](outputs/results.json) · [Audit](outputs/audit_log.json) · [Metrics](outputs/metrics.json) · [Generated grade report](outputs/lab_report.md)
+
 > 👤 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).  
 > 🎯 **Mục tiêu:** đóng vai **Blue Team** để học cách xây Guardrails phòng thủ, rồi đóng vai **Red Team** để tấn công agent **Red** hoặc **Red Advance**.  
 > ✅ Làm theo **Checkpoint 1 → 5** trong [`CHECKPOINTS.md`](CHECKPOINTS.md) · nộp theo [`SUBMISSION.md`](SUBMISSION.md).
