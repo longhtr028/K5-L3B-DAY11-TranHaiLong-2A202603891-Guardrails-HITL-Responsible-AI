@@ -8,7 +8,7 @@ The local run uses deterministic fixtures. The live OpenRouter model and the sep
 
 - All six banking controls passed. All seven defensive probes and three edge cases were blocked.
 - The rate limiter let through 10 of 15 requests in a 60-second window. The audit records all 31 decisions and the monitor reports a rate-limit alert.
-- All ten upstream PII examples matched their labels. The pipeline also redacted a mixed test reply before it reached the user preview and audit.
+- All ten upstream PII examples matched their labels. The offline run also redacted a mixed test reply before it reached the user preview and audit. The live run recorded zero output redactions.
 - The egress check allowed the approved endpoint and denied a foreign destination and a sensitive payload. The test makes no outbound transfer.
 
 The same Blue callbacks run in both fixture and live mode. The suite uses separate user IDs for the control groups and deliberately reuses one user ID to measure rate limiting. Audit and monitoring observe the completed request. The patterns cover known instruction overrides and the supplied PII formats. Their results do not establish general detection or the accuracy of an upstream model.
