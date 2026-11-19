@@ -1,0 +1,43 @@
+{
+  "scope": "Supplemental defensive evidence",
+  "blue": {
+    "source": "outputs/results.json",
+    "source_sha256": "5cf834c7a77cbad6903a8f0430174022b000681e6d6e5b754f2083525692519c",
+    "schema_valid": true,
+    "model_execution": "live",
+    "provider": "openrouter",
+    "model": "liquid/lfm-3-1.7b:free",
+    "banking_requests_allowed": 6,
+    "banking_requests_total": 6,
+    "defensive_probes_blocked": 7,
+    "defensive_probes_total": 7,
+    "rate_limit": {
+      "max_requests": 10,
+      "window_seconds": 60,
+      "sent": 15,
+      "passed": 10,
+      "blocked": 5
+    },
+    "egress": {
+      "allowed_destination": true,
+      "foreign_destination": false,
+      "sensitive_payload": false
+    }
+  },
+  "test_exit_code": 0,
+  "smoke_and_public_tests": {
+    "passed": 55,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "red_advance_safeguard_tests": {
+    "source": "tests/smoke/test_red_advance_nemo.py",
+    "execution": "offline fixtures",
+    "passed": 33,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "course_checkpoint_4_artifact_present": false
+}

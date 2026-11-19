@@ -4,27 +4,24 @@
 
 ## Blue checkpoint results
 
-The local run uses deterministic fixtures. The live OpenRouter model and the separate Red checkpoint have no results in this checkout. The course grader marks the overall package incomplete because \`outputs/attack_results.json\` is missing.
+The live Blue run used OpenRouter’s `liquid/lfm-3-1.7b:free`. All six banking requests passed. All seven defensive probes and three edge cases were blocked. The 60-second rate limiter stopped five of 15 requests, and the audit recorded all 31 decisions. The egress policy permitted the approved destination and rejected a foreign destination and a sensitive payload. [Live Blue results](outputs/results.json) · [Audit](outputs/audit_log.json) · [Metrics](outputs/metrics.json)
 
-- All six banking controls passed. All seven defensive probes and three edge cases were blocked.
-- The rate limiter let through 10 of 15 requests in a 60-second window. The audit records all 31 decisions and the monitor reports a rate-limit alert.
-- All ten upstream PII examples matched their labels. The offline run also redacted a mixed test reply before it reached the user preview and audit. The live run recorded zero output redactions.
-- The egress check allowed the approved endpoint and denied a foreign destination and a sensitive payload. The test makes no outbound transfer.
+## Supplemental safeguard validation
 
-The same Blue callbacks run in both fixture and live mode. The suite uses separate user IDs for the control groups and deliberately reuses one user ID to measure rate limiting. Audit and monitoring observe the completed request. The patterns cover known instruction overrides and the supplied PII formats. Their results do not establish general detection or the accuracy of an upstream model.
+All 55 smoke and public tests passed, including 33 Red Advance safeguard tests with offline fixtures. Those tests cover the input and output rails, failure handling and plugin wiring. Blue also matched all ten supplied PII fixtures and redacted an injected fixture response on its offline path. [Generated validation evidence](outputs/defense_validation.json)
+
+The course grader reports the overall package incomplete because Checkpoint 4 requires `outputs/attack_results.json`. The validation evidence records defensive behavior. [Generated grade report](outputs/lab_report.md)
 
 ### Reproduce locally
 
-Run from the repo root with Python 3.12 and dependencies from \`requirements.txt\`.
+Run from the repository root with Python 3.12 and the dependencies in `requirements.txt`. With an OpenRouter key configured locally, `--part 3` reruns Blue on the live model. Add `--offline` to use fixtures.
 
-\`\`\`bash
+```bash
 python src/main.py --part 2
-python src/main.py --part 3 --offline
-python -m pytest tests/smoke tests/public -q
+python src/main.py --part 3
+python scripts/verify_defenses.py
 python scripts/grade.py --submission-dir . --out outputs/grade_report.json
-\`\`\`
-
-With an OpenRouter key configured locally, \`python src/main.py --part 3\` selects the course's configured live Blue model. Check \`model_execution\` in the generated result. [Blue results](outputs/results.json) · [Audit](outputs/audit_log.json) · [Metrics](outputs/metrics.json) · [Generated grade report](outputs/lab_report.md)
+```
 
 > 👤 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).  
 > 🎯 **Mục tiêu:** đóng vai **Blue Team** để học cách xây Guardrails phòng thủ, rồi đóng vai **Red Team** để tấn công agent **Red** hoặc **Red Advance**.  
