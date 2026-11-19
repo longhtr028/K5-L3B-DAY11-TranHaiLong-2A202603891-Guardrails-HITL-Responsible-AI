@@ -2,23 +2,24 @@
 
 **Trần Hải Long · 2A202603891 · K5-L3B**
 
-## Blue checkpoint results
+## Kết quả thực hành
 
-The live Blue run used OpenRouter’s `liquid/lfm-3-1.7b:free`. All six banking requests passed. All seven defensive probes and three edge cases were blocked. The 60-second rate limiter stopped five of 15 requests, and the audit recorded all 31 decisions. The egress policy permitted the approved destination and rejected a foreign destination and a sensitive payload. [Live Blue results](outputs/results.json) · [Audit](outputs/audit_log.json) · [Metrics](outputs/metrics.json)
+| Hạng mục | Kết quả |
+|---|---|
+| Blue trên OpenRouter | 6/6 câu hỏi ngân hàng được xử lý, 7/7 yêu cầu thử phòng vệ và 3/3 ca biên bị chặn. Bộ giới hạn chặn 5/15 yêu cầu trong cửa sổ 60 giây. |
+| Red trên Gemini | Phát hiện dữ liệu mẫu bị lộ trong 4/5 ca. |
+| Red Advance trên Gemini | Không phát hiện dữ liệu mẫu bị lộ trong 5 ca. |
+| Kiểm thử | 55 bài kiểm thử smoke và public đạt, gồm 33 bài kiểm tra lớp phòng vệ của Red Advance bằng dữ liệu mô phỏng. |
 
-## Supplemental safeguard validation
+Hai lượt chạy ở Checkpoint 4 dùng `gemini:gemini-3.5-flash`. Mỗi agent có đủ năm kết quả và không gặp lỗi thực thi. Số ca lộ dữ liệu trong tệp tổng hợp khớp với từng tệp kết quả riêng. [Kết quả Blue](outputs/results.json) · [Kết quả Checkpoint 4](outputs/attack_results.json)
 
-All 55 smoke and public tests passed, including 33 Red Advance safeguard tests with offline fixtures. Those tests cover the input and output rails, failure handling and plugin wiring. Blue also matched all ten supplied PII fixtures and redacted an injected fixture response on its offline path. [Generated validation evidence](outputs/defense_validation.json)
+## Kiểm tra trước khi nộp
 
-The course grader reports the overall package incomplete because Checkpoint 4 requires `outputs/attack_results.json`. The validation evidence records defensive behavior. [Generated grade report](outputs/lab_report.md)
+Trình chấm cục bộ xác nhận đủ hai tệp bắt buộc, `results.json` đúng schema và các bài kiểm thử public đều đạt. Điểm chính thức do giảng viên xác nhận. [Báo cáo chấm](outputs/lab_report.md) · [Kết quả kiểm tra phòng vệ](outputs/defense_validation.json)
 
-### Reproduce locally
-
-Run from the repository root with Python 3.12 and the dependencies in `requirements.txt`. With an OpenRouter key configured locally, `--part 3` reruns Blue on the live model. Add `--offline` to use fixtures.
+Chạy từ thư mục gốc của repo với Python 3.12 và các thư viện trong `requirements.txt`. Lệnh đầu tiên đọc kết quả Blue đã lưu và chạy lại các bài kiểm tra phòng vệ. Lệnh thứ hai tạo báo cáo chấm.
 
 ```bash
-python src/main.py --part 2
-python src/main.py --part 3
 python scripts/verify_defenses.py
 python scripts/grade.py --submission-dir . --out outputs/grade_report.json
 ```
