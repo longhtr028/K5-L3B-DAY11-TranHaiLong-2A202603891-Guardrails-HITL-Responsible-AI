@@ -51,7 +51,7 @@ async def part2_guardrails():
     print("(LLM-as-Judge / NeMo — optional, skipped)")
 
 
-async def part3_assignment_suite():
+async def part3_assignment_suite(*, offline=False):
     """Checkpoint 3: defense suite → outputs/results.json."""
     print("\n" + "=" * 60)
     print("CHECKPOINT 3: Assignment suite → outputs/*.json")
@@ -63,22 +63,12 @@ async def part3_assignment_suite():
         run_assignment_suite,
     )
 
-    try:
-        plugins = build_production_plugins(use_llm_judge=False)
-        audit, monitor = build_observability()
-        pipeline = {"plugins": plugins, "audit": audit, "monitor": monitor}
-        result = await run_assignment_suite(pipeline)
-        print("Suite finished.")
-        print("Wrote outputs under repo outputs/")
-        return result
-    except NotImplementedError as e:
-        print(
-            "Chưa xong Checkpoint 3 (src/assignment/pipeline.py). "
-            "Hoàn thành rồi chạy lại từ gốc repo:\n"
-            "  python src/main.py --part 3"
-        )
-        print(f"Detail: {e}")
-        return None
+    plugins = build_production_plugins(use_llm_judge=False)
+    audit, monitor = build_observability()
+    pipeline = {"plugins": plugins, "audit": audit, "monitor": monitor, "offline": offline}
+    result = await run_assignment_suite(pipeline)
+    print(f"Blue suite wrote outputs/*.json ({result['model_execution']}).")
+    return result
 
 
 async def part4_attacks():
@@ -133,24 +123,26 @@ async def part4_attacks():
     }
 
 
-async def main(parts=None):
-    setup_api_key()
+async def main(parts=None, *, offline=False):
 
     if parts is None:
         parts = [2, 3, 4]  # Core: CP2 → CP3 → CP4
+
+    if 4 in parts:
+        setup_api_key()
 
     for part in parts:
         if part == 2:
             await part2_guardrails()
         elif part == 3:
-            await part3_assignment_suite()
+            await part3_assignment_suite(offline=offline)
         elif part == 4:
             await part4_attacks()
         else:
             print(f"Unknown part: {part}. Dùng --part 2, 3, hoặc 4.")
 
     print("\n" + "=" * 60)
-    print("Lab 11 complete! Check your results above.")
+    print("Selected checkpoints finished.")
     print("=" * 60)
 
 
@@ -167,9 +159,12 @@ if __name__ == "__main__":
         choices=[2, 3, 4],
         help="2=CP2 guardrails · 3=CP3 suite · 4=CP4 red-team",
     )
+    parser.add_argument("--offline", action="store_true", help="Use fixtures for the Blue suite")
     args = parser.parse_args()
-
-    if args.part:
-        asyncio.run(main(parts=[args.part]))
-    else:
-        asyncio.run(main())
+    if args.offline and args.part == 4:
+        parser.error("--offline applies only to the Blue checkpoints")
+    selected = [args.part] if args.part else ([2, 3] if args.offline else None)
+    try:
+        asyncio.run(main(parts=selected, offline=args.offline))
+    except ValueError as exc:
+        parser.exit(2, f"Error: {exc}\n")
